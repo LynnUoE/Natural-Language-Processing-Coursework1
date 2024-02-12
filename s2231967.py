@@ -43,36 +43,36 @@ from twitter.twitter import *
 twitter_file_ids = "20100128.txt"
 assert twitter_file_ids in xtwc.fileids()
 
-
 # Some helper functions
 
 import matplotlib.pyplot as plt
 
+
 def hist(hh: List[float], title: str, align: str = 'mid',
          log: bool = False, block: bool = False):
-  """
+    """
   Show a histgram with bars showing mean and standard deviations
   :param hh: the data to plot
   :param title: the plot title
   :param align: passed to pyplot.hist, q.v.
   :param log: passed to pyplot.hist, q.v.  If present will be added to title
   """
-  hax=plt.subplots()[1] # Thanks to https://stackoverflow.com/a/7769497
-  sdax=hax.twiny()
-  hax.hist(hh,bins=30,color='lightblue',align=align,log=log)
-  hax.set_title(title+(' (log plot)' if log else ''))
-  ylim=hax.get_ylim()
-  xlim=hax.get_xlim()
-  m=np.mean(hh)
-  sd=np.std(hh)
-  sdd=[(i,m+(i*sd)) for i in range(int(xlim[0]-(m+1)),int(xlim[1]-(m-3)))]
-  for s,v in sdd:
-       sdax.plot([v,v],[0,ylim[0]+ylim[1]],'r' if v==m else 'pink')
-  sdax.set_xlim(xlim)
-  sdax.set_ylim(ylim)
-  sdax.set_xticks([v for s,v in sdd])
-  sdax.set_xticklabels([str(s) for s,v in sdd])
-  plt.show(block=block)
+    hax = plt.subplots()[1]  # Thanks to https://stackoverflow.com/a/7769497
+    sdax = hax.twiny()
+    hax.hist(hh, bins=30, color='lightblue', align=align, log=log)
+    hax.set_title(title + (' (log plot)' if log else ''))
+    ylim = hax.get_ylim()
+    xlim = hax.get_xlim()
+    m = np.mean(hh)
+    sd = np.std(hh)
+    sdd = [(i, m + (i * sd)) for i in range(int(xlim[0] - (m + 1)), int(xlim[1] - (m - 3)))]
+    for s, v in sdd:
+        sdax.plot([v, v], [0, ylim[0] + ylim[1]], 'r' if v == m else 'pink')
+    sdax.set_xlim(xlim)
+    sdax.set_ylim(ylim)
+    sdax.set_xticks([v for s, v in sdd])
+    sdax.set_xticklabels([str(s) for s, v in sdd])
+    plt.show(block=block)
 
 
 def compute_accuracy(classifier, data: List[Tuple[List, str]]) -> float:
@@ -87,10 +87,10 @@ def compute_accuracy(classifier, data: List[Tuple[List, str]]) -> float:
     for d, gold in data:
         predicted = classifier.classify(d)
         correct += predicted == gold
-    return correct/len(data)
+    return correct / len(data)
 
 
-def apply_extractor(extractor_f: Callable[[str, str, str, str, str], List[Any]], data: List[Tuple[Tuple[str], str]])\
+def apply_extractor(extractor_f: Callable[[str, str, str, str, str], List[Any]], data: List[Tuple[Tuple[str], str]]) \
         -> List[Tuple[List[Any], str]]:
     """
     Helper function:
@@ -122,7 +122,9 @@ class NltkClassifierWrapper:
     This is a little wrapper around the nltk classifiers so that we can interact with them
     in the same way as the Naive Bayes classifier.
     """
-    def __init__(self, classifier_class: nltk.classify.api.ClassifierI, train_features: List[Tuple[List[Any], str]], **kwargs):
+
+    def __init__(self, classifier_class: nltk.classify.api.ClassifierI, train_features: List[Tuple[List[Any], str]],
+                 **kwargs):
         """
 
         :param classifier_class: the kind of classifier we want to create an instance of.
@@ -150,8 +152,9 @@ class NltkClassifierWrapper:
         """
         return self.classifier_obj.classify(NltkClassifierWrapper.list_to_freq_dict(d))
 
-    def show_most_informative_features(self, n = 10):
+    def show_most_informative_features(self, n=10):
         self.classifier_obj.show_most_informative_features(n)
+
 
 # End helper functions
 
@@ -169,7 +172,7 @@ def train_LM(corpus: nltk.corpus.CorpusReader) -> LgramModel:
 
     :return: A padded letter bigram model based on nltk.model.NgramModel
     """
-    #raise NotImplementedError  # remove when you finish defining this function
+    # raise NotImplementedError  # remove when you finish defining this function
 
     # subset the corpus to only include all-alpha tokens,
     # converted to lower-case (_after_ the all-alpha check)
@@ -187,6 +190,7 @@ def train_LM(corpus: nltk.corpus.CorpusReader) -> LgramModel:
     #   padded bigram letter language model
     return lm
 
+
 # Question 1.2 [7.5 marks]
 def tweet_ent(file_name: str, bigram_model: LgramModel) -> List[Tuple[float, List[str]]]:
     """
@@ -198,25 +202,27 @@ def tweet_ent(file_name: str, bigram_model: LgramModel) -> List[Tuple[float, Lis
 
     :return: ordered list of average entropies and tweets"""
 
-    #raise NotImplementedError # remove when you finish defining this function
+    # raise NotImplementedError # remove when you finish defining this function
 
     # Clean up the tweet corpus to remove all non-alpha
     # tokens and tweets with less than 5 (remaining) tokens, converted
     # to lowercase
     list_of_tweets = xtwc.sents(file_name)
-
-    # Clean up the Twitter corpus.
-    cleaned_list_of_tweets = []
-    for tweet in list_of_tweets:
-        cleaned_tweet = ''.join([word.lower() for word in tweet if word.isalpha()])
-        if len(cleaned_tweet) >= 5:
-            cleaned_list_of_tweets.append(cleaned_tweet)
-
-    # Compute the entropy for each tweet
     tweet_entropies = []
-    for tweet in cleaned_list_of_tweets:
-        entropy = bigram_model.entropy(tweet, pad_left=True, pad_right=True, verbose=False, perItem=True)
-        tweet_entropies.append((entropy, tweet))
+
+    for tweet in list_of_tweets:
+
+        # Clean up the Twitter corpus.
+        cleaned_tweet = [word.lower() for word in tweet if word.isalpha()]
+        if len(cleaned_tweet) < 5:
+            continue
+
+        # Compute the entropy for each tweet
+        total_ent = 0
+        for token in cleaned_tweet:
+            total_ent += bigram_model.entropy(token, pad_left=True, pad_right=True, verbose=False, perItem=True)
+        average_entropy = total_ent / len(cleaned_tweet)
+        tweet_entropies.append((average_entropy, cleaned_tweet))
 
     # Sort the tweets by entropy
     tweet_entropies.sort(key=lambda x: x[0])
@@ -226,6 +232,7 @@ def tweet_ent(file_name: str, bigram_model: LgramModel) -> List[Tuple[float, Lis
     #  average per_item bigram entropy of the tokens in the tweet.
     #  The list should be sorted by entropy.
     return tweet_entropies
+
 
 # Question 1.3 [3 marks]
 def short_answer_1_3() -> str:
@@ -241,6 +248,7 @@ def short_answer_1_3() -> str:
     """
     return inspect.cleandoc("Your answer")
 
+
 # Question 1.4 [3 marks]
 def short_answer_1_4() -> str:
     """
@@ -250,13 +258,14 @@ def short_answer_1_4() -> str:
     :return: your answer
     """
     return inspect.cleandoc(
-                            "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'"
-                            "p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'"
-                            "backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data"
-                            "p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context"
-                            "p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after backing off"
-                            "p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'"
-                            "7.85102054894183 # the entropy of 'bbq'")
+        "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'"
+        "p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'"
+        "backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data"
+        "p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context"
+        "p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after backing off"
+        "p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'"
+        "7.85102054894183 # the entropy of 'bbq'")
+
 
 # Question 1.5 [3 marks]
 def short_answer_1_5() -> str:
@@ -271,11 +280,12 @@ def short_answer_1_5() -> str:
     # Please comment them out again or delete them before submitting.
     # Note that you will have to close the two plot windows to allow this
     #  function to return.
-    just_e = [e for (e,tw) in ents]
-    hist(just_e,"Bi-char entropies from cleaned twitter data")
-    hist(just_e,"Bi-char entropies from cleaned twitter data",
-         log=True,block=True)
+    just_e = [e for (e, tw) in ents]
+    hist(just_e, "Bi-char entropies from cleaned twitter data")
+    hist(just_e, "Bi-char entropies from cleaned twitter data",
+         log=True, block=True)
     return inspect.cleandoc("your answer")
+
 
 # Question 1.6 [10 marks]
 def is_English(bigram_model: LgramModel, tweet: List[str]) -> bool:
@@ -286,7 +296,7 @@ def is_English(bigram_model: LgramModel, tweet: List[str]) -> bool:
     :param tweet: the tweet
     :return: True if the tweet is classified as English, False otherwise
     """
-    #raise NotImplementedError # remove when you finish defining this function
+    # raise NotImplementedError # remove when you finish defining this function
 
 
 # Question 1.7 [16 marks]
@@ -339,8 +349,8 @@ class NaiveBayes:
 
     @staticmethod
     def train(data: List[Tuple[List[Any], str]], alpha: float, vocab: Set[Any]) -> Tuple[Dict[str, float],
-          Dict[str, Dict[
-          Any, float]]]:
+    Dict[str, Dict[
+        Any, float]]]:
         """
         Estimates the prior and likelihood from the data with Lidstone smoothing.
 
@@ -399,26 +409,31 @@ def open_question_2_2() -> str:
     """
     return inspect.cleandoc("""Your answer""")
 
+
 # Feature extractors used in the table:
 
 def feature_extractor_1(v: str, n1: str, p: str, n2: str) -> List[Any]:
     return [("v", v)]
 
+
 def feature_extractor_2(v: str, n1: str, p: str, n2: str) -> List[Any]:
     return [("n1", n1)]
+
 
 def feature_extractor_3(v: str, n1: str, p: str, n2: str) -> List[Any]:
     return [("p", p)]
 
+
 def feature_extractor_4(v: str, n1: str, p: str, n2: str) -> List[Any]:
     return [("n2", n2)]
+
 
 def feature_extractor_5(v: str, n1: str, p: str, n2: str) -> List[Any]:
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
 
 # Question 2.3, part 1 [10 marks]
-def your_feature_extractor(v: str, n1: str, p:str, n2:str) -> List[Any]:
+def your_feature_extractor(v: str, n1: str, p: str, n2: str) -> List[Any]:
     """
     Takes the head words and produces a list of features. The features may
     be of any type as long as they are hashable.
@@ -431,6 +446,7 @@ def your_feature_extractor(v: str, n1: str, p:str, n2:str) -> List[Any]:
     :return: A list of features produced by you.
     """
     raise NotImplementedError  # remove when you finish defining this function
+
 
 # Question 2.3, part 2 [10 marks]
 def open_question_2_3() -> str:
@@ -449,6 +465,7 @@ Format the output of your submission for both development and automarking.
 !!!!! DO NOT MODIFY THIS PART !!!!!
 """
 
+
 def answers():
     # Global variables for answers that will be used by automarker
     global ents, lm, top10_ents, bottom10_ents
@@ -458,7 +475,6 @@ def answers():
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
     global dev_tweets_preds
-
 
     print("*** Part I***\n")
 
@@ -522,12 +538,11 @@ def answers():
     print("30 features with highest absolute weights")
     logistic_regression_model.show_most_informative_features(30)
 
-    print(f"Accuracy on the devset: {lr_acc*100}")
+    print(f"Accuracy on the devset: {lr_acc * 100}")
 
     answer_open_question_2_3 = open_question_2_3()
     print("Answer to open question:")
     print(answer_open_question_2_3)
-
 
 
 if __name__ == "__main__":
