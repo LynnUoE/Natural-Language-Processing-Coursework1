@@ -178,15 +178,14 @@ def train_LM(corpus: nltk.corpus.CorpusReader) -> LgramModel:
     corpus_tokens = [word.lower() for word in corpus.words() if word.isalpha()]
 
     # Put tokens into one string.
-    corpus_string = ''.join(corpus_tokens)
+    # corpus_string = ''.join(corpus_tokens)
 
     # Train the LgramModel (bigram) with left and right padding on.
-    lm = LgramModel(2, [corpus_string], pad_left=True, pad_right=True)
+    lm = LgramModel(2, corpus_tokens, pad_left=True, pad_right=True)
 
     # Return the tokens and a smoothed (using the default estimator)
     #   padded bigram letter language model
     return lm
-
 
 # Question 1.2 [7.5 marks]
 def tweet_ent(file_name: str, bigram_model: LgramModel) -> List[Tuple[float, List[str]]]:
@@ -209,27 +208,15 @@ def tweet_ent(file_name: str, bigram_model: LgramModel) -> List[Tuple[float, Lis
     # Clean up the Twitter corpus.
     cleaned_list_of_tweets = []
     for tweet in list_of_tweets:
-        cleaned_tweet = []
-        for word in tweet:
-            if word.isalpha():
-                cleaned_word = word.lower()
-                cleaned_tweet.append(cleaned_word)
-
+        cleaned_tweet = ''.join([word.lower() for word in tweet if word.isalpha()])
         if len(cleaned_tweet) >= 5:
             cleaned_list_of_tweets.append(cleaned_tweet)
 
     # Compute the entropy for each tweet
     tweet_entropies = []
     for tweet in cleaned_list_of_tweets:
-        total_entropy = 0
-        total_char = 0
-        for word in tweet:
-            padded_word = "<s>" + word + "</s>"  # add the padding to the start and the end
-            total_entropy += bigram_model.entropy(padded_word)
-            total_char += len(word)
-
-        average_entropy = total_entropy / total_char if total_char > 0 else 0
-        tweet_entropies.append((average_entropy, tweet))
+        entropy = bigram_model.entropy(tweet, pad_left=True, pad_right=True, verbose=False, perItem=True)
+        tweet_entropies.append((entropy, tweet))
 
     # Sort the tweets by entropy
     tweet_entropies.sort(key=lambda x: x[0])
@@ -262,17 +249,14 @@ def short_answer_1_4() -> str:
 
     :return: your answer
     """
-    return inspect.cleandoc("backing off for ('<s>', 'b') # Calculate the probability of 'b' after '<s>'"
-                            "p(b|()) = [1-gram] 0.015402 # unigram probability of 'b'"
-                            "p(b|('<s>',)) = [2-gram] 0.008489 # bigram probability of 'b' following '<s>'"
-                            "p(b|('b',)) = [2-gram] 0.008287 # bigram probability of 'b' following 'b'"
-                            "backing off for ('b', 'q') # Calculate the probability of 'q' following 'b'"
-                            "p(q|()) = [1-gram] 0.001083 # unigram probability of 'p'"
-                            "p(q|('b',)) = [2-gram] 0.000088 # The bigram probability of 'q' following 'b'"
-                            "backing off for ('q', '</s>') # Calculate the probability of '</s>' following 'q'"
-                            "p(</s>|()) = [1-gram] 0.000000 # unigram of </s> is 0, the end symbol doesn't occur standalone"
-                            "p(</s>|('q',)) = [2-gram] 0.000000 # bigram probability of '</s>' following 'q' is 0 -> there is no 'q' ending a sentence in the training corpus"
-                            "13.502520853479023 # the entropy of 'bbq'")
+    return inspect.cleandoc(
+                            "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'"
+                            "p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'"
+                            "backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data"
+                            "p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context"
+                            "p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after backing off"
+                            "p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'"
+                            "7.85102054894183 # the entropy of 'bbq'")
 
 # Question 1.5 [3 marks]
 def short_answer_1_5() -> str:
@@ -287,10 +271,10 @@ def short_answer_1_5() -> str:
     # Please comment them out again or delete them before submitting.
     # Note that you will have to close the two plot windows to allow this
     #  function to return.
-    #just_e = [e for (e,tw) in ents]
-    # hist(just_e,"Bi-char entropies from cleaned twitter data")
-    #hist(just_e,"Bi-char entropies from cleaned twitter data",
-     #    log=True,block=True)
+    just_e = [e for (e,tw) in ents]
+    hist(just_e,"Bi-char entropies from cleaned twitter data")
+    hist(just_e,"Bi-char entropies from cleaned twitter data",
+         log=True,block=True)
     return inspect.cleandoc("your answer")
 
 # Question 1.6 [10 marks]
@@ -302,7 +286,8 @@ def is_English(bigram_model: LgramModel, tweet: List[str]) -> bool:
     :param tweet: the tweet
     :return: True if the tweet is classified as English, False otherwise
     """
-    raise NotImplementedError # remove when you finish defining this function
+    #raise NotImplementedError # remove when you finish defining this function
+
 
 # Question 1.7 [16 marks]
 def essay_question():
