@@ -246,7 +246,7 @@ def short_answer_1_3() -> str:
    
     :return: your answer
     """
-    return inspect.cleandoc("Your answer")
+    return inspect.cleandoc("Left and right padding, represented by special symbols '<s>' and '</s>', indicate a string's beginning and end, respectively. This practice improves the accuracy of probability estimates for N-gram and L-gram models. (<s>xq</s>) includes (<s>x) and (q</s>) with padding. 'x' and 'q' are rare as initial and final letters in English. Thus, the bigram with padding will have a lower probability and lead to a higher average letter entropy.")
 
 
 # Question 1.4 [3 marks]
@@ -284,7 +284,7 @@ def short_answer_1_5() -> str:
     # hist(just_e, "Bi-char entropies from cleaned twitter data")
     # hist(just_e, "Bi-char entropies from cleaned twitter data",
     #     log=True, block=True)
-    return inspect.cleandoc("your answer")
+    return inspect.cleandoc("The entropy values are clustered around the mean with a significant drop-off as the entropy value increases which indicates that most tweets have a similar level of predictability in character combinations. Figure 2 reveals a wide range of higher entropy values in the distribution's tail. To classify tweets, lower entropy tweets can represent text that aligns with the character patterns in Brown corpus (English). Higher entropy tweets can represent non-English text.")
 
 
 # Question 1.6 [10 marks]
@@ -302,12 +302,12 @@ def is_English(bigram_model: LgramModel, tweet: List[str]) -> bool:
     if len(tweet) < 5 or not all(word.isalpha() for word in tweet):
         return False
 
-    # Calculate each word entropy in the tweet
+    # Calculate average word entropy in the tweet
     word_entropies = [bigram_model.entropy(word, pad_left=True, pad_right=True, verbose=False, perItem=True)
                       for word in tweet]
     average_ent = sum(word_entropies)/len(word_entropies)
 
-    # English entropy based on the distribution gram
+    # Define the English entropy based on the distribution grams
     english_ent = 4.5
 
     return average_ent <= english_ent
