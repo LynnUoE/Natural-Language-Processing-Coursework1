@@ -258,7 +258,7 @@ def short_answer_1_4() -> str:
     :return: your answer
     """
     return inspect.cleandoc(
-        "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'"
+        "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>' "
         "p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'"
         "backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data"
         "p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context"
@@ -280,10 +280,10 @@ def short_answer_1_5() -> str:
     # Please comment them out again or delete them before submitting.
     # Note that you will have to close the two plot windows to allow this
     #  function to return.
-    just_e = [e for (e, tw) in ents]
-    hist(just_e, "Bi-char entropies from cleaned twitter data")
-    hist(just_e, "Bi-char entropies from cleaned twitter data",
-         log=True, block=True)
+    # just_e = [e for (e, tw) in ents]
+    # hist(just_e, "Bi-char entropies from cleaned twitter data")
+    # hist(just_e, "Bi-char entropies from cleaned twitter data",
+    #     log=True, block=True)
     return inspect.cleandoc("your answer")
 
 
@@ -297,6 +297,20 @@ def is_English(bigram_model: LgramModel, tweet: List[str]) -> bool:
     :return: True if the tweet is classified as English, False otherwise
     """
     # raise NotImplementedError # remove when you finish defining this function
+
+    # Check if the tweet is alphabet and the length of the tweet is over 5 tokens
+    if len(tweet) < 5 or not all(word.isalpha() for word in tweet):
+        return False
+
+    # Calculate each word entropy in the tweet
+    word_entropies = [bigram_model.entropy(word, pad_left=True, pad_right=True, verbose=False, perItem=True)
+                      for word in tweet]
+    average_ent = sum(word_entropies)/len(word_entropies)
+
+    # English entropy based on the distribution gram
+    english_ent = 4.5
+
+    return average_ent <= english_ent
 
 
 # Question 1.7 [16 marks]
