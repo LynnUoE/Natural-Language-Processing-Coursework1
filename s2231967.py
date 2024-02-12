@@ -359,7 +359,11 @@ class NaiveBayes:
 
         :return: The set of all features used in the training data for all classes.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        # raise NotImplementedError  # remove when you finish defining this function
+        vocab = set()
+        for features, _ in data:
+            vocab.update(features)
+        return vocab
 
     @staticmethod
     def train(data: List[Tuple[List[Any], str]], alpha: float, vocab: Set[Any]) -> Tuple[Dict[str, float],
@@ -382,11 +386,32 @@ class NaiveBayes:
             likelihood[c][f] = P(f|c)
         """
         assert alpha >= 0.0
-        raise NotImplementedError  # remove when you finish defining this function
 
-        # Compute raw frequency distributions
+        # Initialize dictionaries
+        class_counts = defaultdict(int)
+        feature_counts = defaultdict(lambda: defaultdict(int))
+        total_count = 0
 
-        # Compute prior (MLE). Compute likelihood with smoothing.
+        # Count occurrences of classes and features
+        for features, label in data:
+            class_counts[label] += 1
+            total_count += 1
+            for feature in features:
+                feature_counts[label][feature] += 1
+
+        # Calculate prior probabilities
+        prior = {label: count / total_count for label, count in class_counts.items()}
+
+        # Initialize likelihood dictionary
+        likelihood = defaultdict(dict)
+
+        # Calculate likelihood probabilities with Lidstone smoothing
+        for label in class_counts:
+            total_features = sum(feature_counts[label].values())
+            denominator = total_features + alpha * len(vocab)
+            for feature in vocab:
+                count = feature_counts[label][feature]
+                likelihood[label][feature] = (count + alpha) / denominator
 
         return prior, likelihood
 
@@ -397,7 +422,26 @@ class NaiveBayes:
 
         :return: The probability p(c|d) for all classes as a dictionary.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        probabilities = dict()
+
+        # Calculate P(c|d) for each class
+        for c in self.prior:
+            # Start with the prior probability P(c)
+            prob_c_d = self.prior[c]
+
+            # Multiply by the probability of each feature given the class
+            for feature in d:
+                if feature in self.vocab:
+                    prob_c_d *= self.likelihood[c][feature]
+
+            probabilities[c] = prob_c_d
+
+        # Normalizing the probabilities so they sum to 1
+        total_prob = sum(probabilities.values())
+        for c in probabilities:
+            probabilities[c] /= total_prob
+
+        return probabilities
 
     def classify(self, d: List[Any]) -> str:
         """
@@ -406,7 +450,13 @@ class NaiveBayes:
 
         :return: The most likely class.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        # Get the probabilities for each class
+        class_probabilities = self.prob_classify(d)
+
+        # Find the class with the highest probability
+        most_likely_class = max(class_probabilities, key=class_probabilities.get)
+
+        return most_likely_class
 
 
 # Question 2.2 [15 marks]
