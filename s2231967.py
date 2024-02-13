@@ -474,7 +474,17 @@ def open_question_2_2() -> str:
 
     Limit: 150 words for all three sub-questions together.
     """
-    return inspect.cleandoc("""Your answer""")
+    return inspect.cleandoc("""The individual features provide basic information about the sentence structure but can not capture the relationships 
+between these phrases. When combining these features ([V=N1=P=N2]), there's a significant increase in accuracy, which 
+suggests that the interaction between the phrases is critical for predicting the correct class. It implies that the task 
+requires how these elements relate to each other within the sentence structure to make accurate predictions.
+
+The Naive Bayes model accuracy is 79.49987620698192%, slightly lower than the logistic regression. Naive Bayes assumes 
+all the features are independent given the class label. Logistic regression captures the iteration between features.
+
+I would be against it. A binary feature captures a rule that may strongly indicate the correct classification. It may 
+not apply to sparse data if the rule is too specific. Additionally, if these conditions rarely occur together, the 
+feature may not contribute much to the model's performance.""")
 
 
 # Feature extractors used in the table:
@@ -512,8 +522,36 @@ def your_feature_extractor(v: str, n1: str, p: str, n2: str) -> List[Any]:
 
     :return: A list of features produced by you.
     """
-    raise NotImplementedError  # remove when you finish defining this function
+    features=[]
 
+    # Basic features
+    features.append(f'verb:{v}')
+    features.append(f'np1:{n1}')
+    features.append(f'prep:{p}')
+    features.append(f'np2:{n2}')
+
+    # Pairwise combinations to capture local relationships
+    features.append(f'verb_np1:{v}_{n1}')
+    features.append(f'verb_prep:{v}_{p}')
+    features.append(f'verb_np2:{v}_{n2}')
+    features.append(f'np1_prep:{n1}_{p}')
+    features.append(f'prep_np2:{p}_{n2}')
+    features.append(f'np1_np2:{n1}_{n2}')
+
+    # Three-word combinations to capture broader context
+    features.append(f'verb_np1_prep:{v}_{n1}_{p}')
+    features.append(f'np1_prep_np2:{n1}_{p}_{n2}')
+
+    # Potential syntactic features for prepositions
+    common_followers = {'put': 'on', 'take': 'off', 'give': 'to'}
+    if v in common_followers and common_followers[v] == p:
+        features.append(f'common_verb_prep_combo:{v}_{p}')
+
+    # Length-based features: the length of a noun phrase may influence attachment decisions
+    features.append(f'np1_length:{len(n1)}')
+    features.append(f'np2_length:{len(n2)}')
+
+    return features
 
 # Question 2.3, part 2 [10 marks]
 def open_question_2_3() -> str:
