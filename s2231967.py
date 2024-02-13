@@ -258,13 +258,13 @@ def short_answer_1_4() -> str:
     :return: your answer
     """
     return inspect.cleandoc(
-        "p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>' "
-        "p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'"
-        "backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data"
-        "p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context"
-        "p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after backing off"
-        "p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'"
-        "7.85102054894183 # the entropy of 'bbq'")
+        """"p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>' 
+        p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'
+        backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data
+        p(q|()) = [1-gram] 0.000892 # unigram probability of 'q' occurring in any context
+        p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after backing off
+        p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'
+        7.85102054894183 # the entropy of 'bbq'""")
 
 
 # Question 1.5 [3 marks]
