@@ -363,6 +363,7 @@ class NaiveBayes:
         vocab = set()
         for features, _ in data:
             vocab.update(features)
+
         return vocab
 
     @staticmethod
@@ -399,21 +400,22 @@ class NaiveBayes:
             for feature in features:
                 feature_counts[label][feature] += 1
 
-        # Calculate prior probabilities
-        prior = {label: count / total_count for label, count in class_counts.items()}
+        # Calculate prior probabilities, map each class to its prior probabilities P(c).
+        prior_probabilities = {label: count / total_count for label, count in class_counts.items()}
 
         # Initialize likelihood dictionary
-        likelihood = defaultdict(dict)
+        likelihood_dict = defaultdict(dict)
 
-        # Calculate likelihood probabilities with Lidstone smoothing
+        # Calculate likelihood probabilities using Lidstone smoothing,
+        # map each feature to its conditional probabilities P(f|c).
         for label in class_counts:
             total_features = sum(feature_counts[label].values())
             denominator = total_features + alpha * len(vocab)
             for feature in vocab:
                 count = feature_counts[label][feature]
-                likelihood[label][feature] = (count + alpha) / denominator
+                likelihood_dict[label][feature] = (count + alpha) / denominator
 
-        return prior, likelihood
+        return prior_probabilities, likelihood_dict
 
     def prob_classify(self, d: List[Any]) -> Dict[str, float]:
         """
@@ -422,26 +424,27 @@ class NaiveBayes:
 
         :return: The probability p(c|d) for all classes as a dictionary.
         """
-        probabilities = dict()
+        joint_probabilities = dict()
 
-        # Calculate P(c|d) for each class
+        # Calculate the joint probability P(c,d) for each class
         for c in self.prior:
             # Start with the prior probability P(c)
-            prob_c_d = self.prior[c]
-
-            # Multiply by the probability of each feature given the class
+            joint_prob_c_d = self.prior[c]
             for feature in d:
                 if feature in self.vocab:
-                    prob_c_d *= self.likelihood[c][feature]
+                    # Multiply by P(f|c) if feature is in vocab, else treat as neutral (1)
+                    joint_prob_c_d *= self.likelihood[c].get(feature, 1)
+            joint_probabilities[c] = joint_prob_c_d
 
-            probabilities[c] = prob_c_d
+        # Normalization to get P(c|d)
+        total_joint_prob = sum(joint_probabilities.values())
+        if total_joint_prob == 0:
+            # Avoid division by zero if no features are in the vocab
+            return {c: 0 for c in self.prior}
+        conditional_probabilities = {c: joint_prob_c_d / total_joint_prob for c, joint_prob_c_d in
+                                     joint_probabilities.items()}
 
-        # Normalizing the probabilities so they sum to 1
-        total_prob = sum(probabilities.values())
-        for c in probabilities:
-            probabilities[c] /= total_prob
-
-        return probabilities
+        return conditional_probabilities
 
     def classify(self, d: List[Any]) -> str:
         """
