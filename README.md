@@ -45,7 +45,7 @@ p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after 
 p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'
 7.85102054894183 # the entropy of 'bbq'
 
-** 95 words
+ 95 words
 |* Marker comment:
 |*
 |*
