@@ -36,7 +36,7 @@ Twitter corpus, bottom 10 entropies: [(17.523736748003564, ['作品によって�
 |* Total for Question 1.2: 7.5 marks
 **
 
-***Question 1.4 (3 marks) ***
+***Question 1.4 (3 marks) 
 p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'
 p(b|('b',)) = [2-gram] 0.007750 # bigram probability of 'b' following 'b'
 backing off for ('b', 'q') # Use a lower-order model to calculate the probability of 'q' following 'b'-> the bigram ('b', 'q') is not found in the training data
@@ -54,7 +54,7 @@ p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'
 |* Total for Question 1.4: 2.5 marks
 **
 
-***Question 1.6 (10 marks) ***
+***Question 1.6 (10 marks) 
 dev tweets, evaluation score: 1.0
 |* Passed automarker value test: 1.0 marks (out of 1)
 English tweets with non-ascii, evaluation score: 0.5
@@ -67,7 +67,7 @@ large set of tweets: timing, evaluation score: 2500.0
 |* Total for Question 1.6: 6.5 marks
 **---
 
-***Question 2.1 (15 marks) ***
+***Question 2.1 (15 marks) 
 
 ** Part 2.1.1: Vocabulary (1 marks) ***
 vocabulary size: 13521
