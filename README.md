@@ -25,7 +25,7 @@ P(</s>|e): 0.348077988641086
 |* Passed automarker test: 1.25 marks (out of 1.25)
 |*
 |* Total for Question 1.1: 7.5 marks
-**---
+**
 
 ***Question 1.2 (7.5 marks) ***
 Twitter corpus, top 10 entropies: [(2.4921691054394848, ['and', 'here', 'is', 'proof', 'the']), (2.5390025889056127, ['and', 'bailed', 'he', 'here', 'is', 'man', 'on', 'that', 'the']), (2.5584079236733106, ['is', 'the', 'this', 'weather', 'worst']), (2.568653427817313, ['s', 's', 's', 's', 's', 's', 's', 's', 's', 's']), '...']
@@ -34,7 +34,7 @@ Twitter corpus, bottom 10 entropies: [(17.523736748003564, ['作品によって�
 |* Passed automarker value test: 3.5 marks (out of 3.5)
 |*
 |* Total for Question 1.2: 7.5 marks
-**---
+**
 
 ***Question 1.4 (3 marks) ***
 p(b|('<s>',)) = [2-gram] 0.046511 # bigram probability of 'b' following '<s>'
@@ -45,14 +45,14 @@ p(q|('b',)) = [2-gram] 0.000092 # bigram probability of 'q' following 'b' after 
 p(</s>|('q',)) = [2-gram] 0.010636 # bigram probability of '</s>' following 'q'
 7.85102054894183 # the entropy of 'bbq'
 
-**--- 95 words
+** 95 words
 |* Marker comment:
 |*
 |*
 |* Hand-examined free text answer. Max length 26+75 words and awarded: 2.5 marks (out of 3)
 |*
 |* Total for Question 1.4: 2.5 marks
-**---
+**
 
 ***Question 1.6 (10 marks) ***
 dev tweets, evaluation score: 1.0
